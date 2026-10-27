@@ -1,98 +1,111 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario de productos</title>
+    <link rel="stylesheet" href="{% static 'productos/estilos.css' %}">
 </head>
 <body>
 
-    <h1>
-        {% if producto %}
-            Editar producto
-        {% else %}
-            Registrar producto
-        {% endif %}
-    </h1>
+    <header class="encabezado">
+        <div class="encabezado-interno">
+            <span class="marca">Inventario</span>
+            <nav class="menu">
+                <a href="{% url 'productos:listar' %}" class="activo">Productos</a>
+                <a href="{% url 'categorias:listar' %}">Categorías</a>
+            </nav>
+        </div>
+    </header>
 
-    {% if messages %}
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endif %}
+    <main class="contenedor">
 
-    <form method="POST">
-        {% csrf_token %}
+        <h1>
+            {% if producto %}
+                Editar producto
+            {% else %}
+                Registrar producto
+            {% endif %}
+        </h1>
 
-        <p>
-            <label for="nombre">Nombre del producto:</label><br>
-            <input
-                id="nombre"
-                type="text"
-                name="nombre"
-                maxlength="100"
-                value="{{ producto.nombre|default:'' }}"
-                required
-            >
-        </p>
-
-        <p>
-            <label for="precio">Precio:</label><br>
-            <input
-                id="precio"
-                type="number"
-                name="precio"
-                min="0"
-                step="0.01"
-                value="{{ producto.precio|default:'' }}"
-                required
-            >
-        </p>
-
-        <p>
-            <label for="cantidad">Cantidad disponible:</label><br>
-            <input
-                id="cantidad"
-                type="number"
-                name="cantidad"
-                min="0"
-                step="1"
-                value="{{ producto.cantidad|default:'' }}"
-                required
-            >
-        </p>
-
-
-                <p>
-            <label for="categoria_id">Categoría:</label><br>
-            <select id="categoria_id" name="categoria_id" required>
-                <option value="">-- Selecciona una categoría --</option>
-                {% for categoria in categorias %}
-                    <option
-                        value="{{ categoria.id }}"
-                        {% if producto.categoria_id|stringformat:"s" == categoria.id %}selected{% endif %}
-                    >
-                        {{ categoria.nombre }}
-                    </option>
-                {% endfor %}
-            </select>
-        </p>
-
-        {% if not categorias %}
-            <p>
-                Primero debes crear una categoría.
-                <a href="{% url 'categorias:crear' %}">Crear categoría</a>
-            </p>
+        {% if messages %}
+            {% for message in messages %}
+                <p class="mensaje {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
         {% endif %}
 
-        <button type="submit">Guardar producto</button>
-    </form>
+        <form class="formulario" method="POST">
+            {% csrf_token %}
 
-    <p>
-        <a href="{% url 'productos:listar' %}">
+            <div class="campo">
+                <label for="nombre">Nombre del producto</label>
+                <input
+                    id="nombre"
+                    type="text"
+                    name="nombre"
+                    maxlength="100"
+                    value="{{ producto.nombre|default:'' }}"
+                    required
+                >
+            </div>
+
+            <div class="campo">
+                <label for="precio">Precio</label>
+                <input
+                    id="precio"
+                    type="number"
+                    name="precio"
+                    min="0"
+                    step="0.01"
+                    value="{{ producto.precio|default:'' }}"
+                    required
+                >
+            </div>
+
+            <div class="campo">
+                <label for="cantidad">Cantidad disponible</label>
+                <input
+                    id="cantidad"
+                    type="number"
+                    name="cantidad"
+                    min="0"
+                    step="1"
+                    value="{{ producto.cantidad|default:'' }}"
+                    required
+                >
+            </div>
+
+            <div class="campo">
+                <label for="categoria_id">Categoría</label>
+                <select id="categoria_id" name="categoria_id" required>
+                    <option value="">-- Selecciona una categoría --</option>
+                    {% for categoria in categorias %}
+                        <option
+                            value="{{ categoria.id }}"
+                            {% if producto.categoria_id|stringformat:"s" == categoria.id %}selected{% endif %}
+                        >
+                            {{ categoria.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {% if not categorias %}
+                <p class="ayuda">
+                    Primero debes crear una categoría.
+                    <a href="{% url 'categorias:crear' %}">Crear categoría</a>
+                </p>
+            {% endif %}
+
+            <button class="boton" type="submit">Guardar producto</button>
+        </form>
+
+        <a class="volver" href="{% url 'productos:listar' %}">
             Volver al inventario
         </a>
-    </p>
+
+    </main>
 
 </body>
 </html>

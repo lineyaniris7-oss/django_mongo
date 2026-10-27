@@ -1,80 +1,97 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventario de productos</title>
+    <link rel="stylesheet" href="{% static 'productos/estilos.css' %}">
 </head>
 <body>
 
-    <h1>Inventario de productos</h1>
+    <header class="encabezado">
+        <div class="encabezado-interno">
+            <span class="marca">Inventario</span>
+            <nav class="menu">
+                <a href="{% url 'productos:listar' %}" class="activo">Productos</a>
+                <a href="{% url 'categorias:listar' %}">Categorías</a>
+            </nav>
+        </div>
+    </header>
 
-    {% if messages %}
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endif %}
+    <main class="contenedor">
 
-    <p>
-        <a href="{% url 'productos:crear' %}">
-            Registrar nuevo producto
-        </a>
-    </p>
+        <h1>Inventario de productos</h1>
 
-        <p>
-        <a href="{% url 'categorias:listar' %}">
-            Ver categorías
-        </a>
-    </p>
+        {% if messages %}
+            {% for message in messages %}
+                <p class="mensaje {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
 
-    <hr>
-
-    {% for producto in productos %}
-
-        <h2>{{ producto.nombre }}</h2>
-
-        <p>
-            <strong>Precio:</strong>
-            ${{ producto.precio }}
-        </p>
-
-        <p>
-            <strong>Cantidad disponible:</strong>
-            {{ producto.cantidad }}
-        </p>
-
-                <p>
-            <strong>Categoría:</strong>
-            {{ producto.categoria_nombre }}
-        </p>
-
-        <p>
-            <a href="{% url 'productos:editar' producto.id %}">
-                Editar
+        <div class="barra-acciones">
+            <a class="boton" href="{% url 'productos:crear' %}">
+                Registrar nuevo producto
             </a>
-        </p>
+            <a class="boton-secundario" href="{% url 'categorias:listar' %}">
+                Ver categorías
+            </a>
+        </div>
 
-        <form
-            method="POST"
-            action="{% url 'productos:eliminar' producto.id %}"
-        >
-            {% csrf_token %}
+        {% if productos %}
+            <div class="tabla-scroll">
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th class="numero">Precio</th>
+                            <th class="numero">Cantidad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for producto in productos %}
+                            <tr>
+                                <td>{{ producto.nombre }}</td>
+                                <td>{{ producto.categoria_nombre }}</td>
+                                <td class="numero">${{ producto.precio }}</td>
+                                <td class="numero {% if producto.cantidad <= 5 %}poco-stock{% endif %}">
+                                    {{ producto.cantidad }}
+                                </td>
+                                <td>
+                                    <div class="acciones-fila">
+                                        <a class="boton-secundario boton-pequeno"
+                                           href="{% url 'productos:editar' producto.id %}">
+                                            Editar
+                                        </a>
 
-            <button
-                type="submit"
-                onclick="return confirm('¿Deseas eliminar este producto?')"
-            >
-                Eliminar
-            </button>
-        </form>
+                                        <form
+                                            method="POST"
+                                            action="{% url 'productos:eliminar' producto.id %}"
+                                        >
+                                            {% csrf_token %}
 
-        <hr>
+                                            <button
+                                                class="boton-peligro"
+                                                type="submit"
+                                                onclick="return confirm('¿Deseas eliminar este producto?')"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="vacio">No hay productos registrados. Usa «Registrar nuevo producto» para agregar el primero.</p>
+        {% endif %}
 
-    {% empty %}
-
-        <p>No hay productos registrados.</p>
-
-    {% endfor %}
+    </main>
 
 </body>
 </html>

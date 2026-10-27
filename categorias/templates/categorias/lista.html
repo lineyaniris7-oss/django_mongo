@@ -1,70 +1,87 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Categorías</title>
+    <link rel="stylesheet" href="{% static 'categorias/estilos.css' %}">
 </head>
 <body>
 
-    <h1>Categorías</h1>
+    <header class="encabezado">
+        <div class="encabezado-interno">
+            <span class="marca">Inventario</span>
+            <nav class="menu">
+                <a href="{% url 'productos:listar' %}">Productos</a>
+                <a href="{% url 'categorias:listar' %}" class="activo">Categorías</a>
+            </nav>
+        </div>
+    </header>
 
-    {% if messages %}
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endif %}
+    <main class="contenedor">
 
-    <p>
-        <a href="{% url 'categorias:crear' %}">
-            Registrar nueva categoría
-        </a>
-    </p>
+        <h1>Categorías</h1>
 
-    <p>
-        <a href="{% url 'productos:listar' %}">
-            Volver al inventario
-        </a>
-    </p>
+        {% if messages %}
+            {% for message in messages %}
+                <p class="mensaje {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
 
-    <hr>
-
-    {% for categoria in categorias %}
-
-        <h2>{{ categoria.nombre }}</h2>
-
-        <p>
-            <strong>Descripción:</strong>
-            {{ categoria.descripcion }}
-        </p>
-
-        <p>
-            <a href="{% url 'categorias:editar' categoria.id %}">
-                Editar
+        <div class="barra-acciones">
+            <a class="boton" href="{% url 'categorias:crear' %}">
+                Registrar nueva categoría
             </a>
-        </p>
+            <a class="boton-secundario" href="{% url 'productos:listar' %}">
+                Volver al inventario
+            </a>
+        </div>
 
-        <form
-            method="POST"
-            action="{% url 'categorias:eliminar' categoria.id %}"
-        >
-            {% csrf_token %}
+        {% if categorias %}
+            <ul class="lista-categorias">
+                {% for categoria in categorias %}
+                    <li>
+                        <div>
+                            <h2 class="categoria-nombre">{{ categoria.nombre }}</h2>
+                            <p class="categoria-descripcion">
+                                {% if categoria.descripcion %}
+                                    {{ categoria.descripcion }}
+                                {% else %}
+                                    Sin descripción
+                                {% endif %}
+                            </p>
+                        </div>
 
-            <button
-                type="submit"
-                onclick="return confirm('¿Deseas eliminar esta categoría?')"
-            >
-                Eliminar
-            </button>
-        </form>
+                        <div class="acciones-fila">
+                            <a class="boton-secundario boton-pequeno"
+                               href="{% url 'categorias:editar' categoria.id %}">
+                                Editar
+                            </a>
 
-        <hr>
+                            <form
+                                method="POST"
+                                action="{% url 'categorias:eliminar' categoria.id %}"
+                            >
+                                {% csrf_token %}
 
-    {% empty %}
+                                <button
+                                    class="boton-peligro"
+                                    type="submit"
+                                    onclick="return confirm('¿Deseas eliminar esta categoría?')"
+                                >
+                                    Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="vacio">No hay categorías registradas. Usa «Registrar nueva categoría» para agregar la primera.</p>
+        {% endif %}
 
-        <p>No hay categorías registradas.</p>
-
-    {% endfor %}
+    </main>
 
 </body>
 </html>
